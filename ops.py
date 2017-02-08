@@ -35,6 +35,13 @@ class batch_norm(object):
 
         return normed
 
+batchnorm_count = 0
+def bn(x):
+    global batchnorm_count
+    batch_object = batch_norm(name=("bn" + str(batchnorm_count)))
+    batchnorm_count += 1
+    return batch_object(x)
+
 # standard convolution layer
 def conv2d(x, inputFeatures, outputFeatures, name):
     with tf.variable_scope(name):
@@ -67,14 +74,3 @@ def dense(x, inputFeatures, outputFeatures, scope=None, with_w=False):
             return tf.matmul(x, matrix) + bias, matrix, bias
         else:
             return tf.matmul(x, matrix) + bias
-
-def merge(images, size):
-    h, w = images.shape[1], images.shape[2]
-    img = np.zeros((h * size[0], w * size[1]))
-
-    for idx, image in enumerate(images):
-        i = idx % size[1]
-        j = idx / size[1]
-        img[j*h:j*h+h, i*w:i*w+w] = image
-
-    return img
