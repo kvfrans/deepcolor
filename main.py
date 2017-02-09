@@ -40,18 +40,15 @@ class Colorize():
                 if reuse:
                     tf.get_variable_scope().reuse_variables()
 
+                # put the generated image + line image on top of each other
+                stacked = tf.concat(3, [self.images_in, image])
                 # process given image
-                h0 = lrelu(conv2d(image, 3, 64, name='d_h0_conv')) #256x256x64
+                h0 = lrelu(conv2d(stacked, 4, 64, name='d_h0_conv')) #256x256x64
                 h1 = lrelu(d_bn1(conv2d(h0, 64, 128, name='d_h1_conv'))) #128x128x128
                 h2 = lrelu(d_bn2(conv2d(h1, 128, 128, name='d_h2_conv'))) #64x64x256
 
-                # process line image
-                m0 = lrelu(conv2d(self.images_in, 1, 64, name='d_m0_conv')) #256x256x64
-                m1 = lrelu(d_bn3(conv2d(m0, 64, 128, name='d_m1_conv'))) #128x128x128
-                m2 = lrelu(d_bn4(conv2d(m1, 128, 128, name='d_m2_conv'))) #64x64x256
-
-                flattened = tf.concat(1, [tf.reshape(h2, [self.batch_size, self.bridge_size]), tf.reshape(m2, [self.batch_size, self.bridge_size])])
-                h3 = lrelu(dense(flattened, self.bridge_size * 2, 64, "d_h3"))
+                flattened = tf.reshape(h2, [self.batch_size, self.bridge_size])
+                h3 = lrelu(dense(flattened, self.bridge_size, 64, "d_h3"))
                 return tf.nn.sigmoid(dense(h3, 64, 1))
 
         self.images_in = tf.placeholder(tf.float32, [None, self.img_size, self.img_size, 1])
