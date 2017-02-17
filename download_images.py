@@ -10,7 +10,10 @@ maxsize = 512
 # tags = ["asu_tora","puuakachan","mankun","hammer_%28sunset_beach%29",""]
 
 # for tag in tags:
-for i in xrange(100):
+
+count = 0
+
+for i in xrange(10000):
     stringreturn = urllib2.urlopen("http://safebooru.org/index.php?page=dapi&s=post&q=index&tags=1girl%20solo&pid="+str(i)).read()
     xmlreturn = untangle.parse(stringreturn)
     for post in xmlreturn.posts.post:
@@ -39,5 +42,6 @@ for i in xrange(100):
             #                                  blockSize=9,
             #                                  C=2)
 
-            cv2.imwrite("imgs/"+str(post["id"])+".jpg",cropped)
+            count += 1
+            cv2.imwrite("imgs/"+str(count)+".jpg",cropped)
             # cv2.imwrite("imgs/"+str(post["id"])+"-edge.jpg",img_edge)

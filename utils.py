@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import cv2
 
 class batch_norm(object):
             # h1 = lrelu(tf.contrib.layers.batch_norm(conv2d(h0, self.df_dim*2, name='d_h1_conv'),decay=0.9,updates_collections=None,epsilon=0.00001,scale=True,scope="d_h1_conv"))
@@ -61,3 +62,41 @@ def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=
             return tf.matmul(input_, matrix) + bias, matrix, bias
         else:
             return tf.matmul(input_, matrix) + bias
+
+def get_image(image_path):
+    return transform(imread(image_path))
+
+def transform(image, npx=512, is_crop=True):
+    cropped_image = cv2.resize(image, (256,256))
+
+    return np.array(cropped_image)
+
+def imread(path):
+    readimage = cv2.imread(path, 1)
+    return readimage
+
+def merge_color(images, size):
+    h, w = images.shape[1], images.shape[2]
+    img = np.zeros((h * size[0], w * size[1], 3))
+
+    for idx, image in enumerate(images):
+        i = idx % size[1]
+        j = idx / size[1]
+        img[j*h:j*h+h, i*w:i*w+w, :] = image
+
+    return img
+
+def merge(images, size):
+    h, w = images.shape[1], images.shape[2]
+    img = np.zeros((h * size[0], w * size[1], 1))
+
+    for idx, image in enumerate(images):
+        i = idx % size[1]
+        j = idx / size[1]
+        img[j*h:j*h+h, i*w:i*w+w] = image
+
+    return img[:,:,0]
+
+def ims(name, img):
+    print "saving img " + name
+    cv2.imwrite(name, img*255)

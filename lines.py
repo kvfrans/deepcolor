@@ -12,6 +12,9 @@ for imname in data:
     img = cv2.imread(imname,0)
     edges = cv2.Canny(img,100,200)
 
+    # kernel = np.ones((5,5),np.float32)/25
+    edges = cv2.blur(cimg,(100,100))
+
     # img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img_edge = cv2.adaptiveThreshold(img, 255,
                                      cv2.ADAPTIVE_THRESH_MEAN_C,
@@ -24,8 +27,7 @@ for imname in data:
     plt.subplot(131),plt.imshow(cimg)
     plt.title('Original Image'), plt.xticks([]), plt.yticks([])
 
-    edges = 255 - edges
-    plt.subplot(132),plt.imshow(edges,cmap = 'gray')
+    plt.subplot(132),plt.imshow(edges)
     plt.title('Edge Image'), plt.xticks([]), plt.yticks([])
 
     plt.subplot(133),plt.imshow(img_edge,cmap = 'gray')
