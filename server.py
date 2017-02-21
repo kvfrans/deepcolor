@@ -25,7 +25,6 @@ def do_uploadc():
     line_s = base64.b64decode(line_data)
     line_img = np.fromstring(line_s, dtype=np.uint8)
     line_img = cv2.imdecode(line_img, -1)
-    line_img = np.expand_dims(line_img, 2)
 
     color_data = request.forms.get("colors")
     color_data = re.sub('^data:image/.+;base64,', '', color_data)
@@ -33,8 +32,9 @@ def do_uploadc():
     color_img = np.fromstring(color_s, dtype=np.uint8)
     color_img = cv2.imdecode(color_img, -1)
 
-    for c in range(0,3):
-        color_img = color_img * (line_img[:,:,0] / 255.0) + line_img * (1 - (line_img[:,:,0] / 255.0))
+    print "Got it"
+    # for c in range(0,3):
+    color_img = color_img * (line_img[:,:] / 255.0)
 
     cv2.imwrite("uploaded/lines.jpg", line_img)
     cv2.imwrite("uploaded/colors.jpg", color_img)
