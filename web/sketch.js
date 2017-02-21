@@ -11,7 +11,10 @@ colorctx.lineJoin = "round";
 colorctx.lineWidth = 6;
 
 
-
+colorctx.beginPath();
+colorctx.rect(0, 0, 512, 512);
+colorctx.fillStyle = "white";
+colorctx.fill();
 
 var lastX;
 var lastY;
@@ -106,8 +109,49 @@ $("#eraser").click(function () {
     mode = "eraser";
 });
 
-$("#coloring").click(function () {
-    mode = "coloring";
+$("#submit").click(function () {
+
+    // change non-opaque pixels to white
+    var imgData = linectx.getImageData(0,0,512,512);
+    var data = imgData.data;
+    var databackup = data.slice(0);
+    for(var i = 0; i < data.length; i+=4)
+    {
+        if(data[i+3]<255)
+        {
+            data[i]=255;
+            data[i+1]=255;
+            data[i+2]=255;
+            data[i+3]=255;
+        }
+    }
+
+    linectx.putImageData(imgData,0,0);
+
+    var dataURL = linecanvas.toDataURL("image/jpg");
+    var dataURLc = colorcanvas.toDataURL("image/jpg");
+
+    imgData = linectx.getImageData(0,0,512,512);
+    data = imgData.data;
+    for(var i = 0; i < data.length; i++)
+    {
+        data[i] = databackup[i];
+    }
+    linectx.putImageData(imgData,0,0);
+    // console.log(dataURL)
+
+    $.ajax({
+        url: '/upload_canvas',
+        type: "POST",
+        data: {colors: dataURLc, lines: dataURL},
+        // data: {lines: "meme"},
+        success: function (result) {
+            console.log("Upload complete!");
+        },
+        error: function (error) {
+            console.log("Something went wrong!");
+        }
+    });
 });
 
 

@@ -2,17 +2,19 @@ import tensorflow as tf
 import numpy as np
 import os
 from glob import glob
+import sys
+import math
 
 import ops
 from ops import *
 from utils import *
 
 class Color():
-    def __init__(self):
-        self.batch_size = 4
-        self.batch_size_sqrt = 2
-        self.image_size = 256
-        self.output_size = 256
+    def __init__(self, imgsize=256, batchsize=4):
+        self.batch_size = batchsize
+        self.batch_size_sqrt = math.sqrt(self.batch_size)
+        self.image_size = imgsize
+        self.output_size = imgsize
 
         self.gf_dim = 64
         self.df_dim = 64
@@ -108,15 +110,7 @@ class Color():
 
 
     def train(self):
-        self.sess = tf.Session()
-        self.sess.run(tf.initialize_all_variables())
-
-        self.saver = tf.train.Saver()
-
-        if self.load("./checkpoint"):
-            print "Loaded"
-        else:
-            print "Load failed"
+        self.loadmodel()
 
         data = glob(os.path.join("imgs", "*.jpg"))
         print data[0]
@@ -157,18 +151,24 @@ class Color():
                 if i % 500 == 0:
                     self.save("./checkpoint", e*100000 + i)
 
-    def sample(self):
+    def loadmodel(self, load_discrim=True):
         self.sess = tf.Session()
         self.sess.run(tf.initialize_all_variables())
 
-        self.saver = tf.train.Saver()
+        if load_discrim:
+            self.saver = tf.train.Saver()
+        else:
+            self.saver = tf.train.Saver(self.g_vars)
 
         if self.load("./checkpoint"):
             print "Loaded"
         else:
             print "Load failed"
 
-        data = glob(os.path.join("imgs", "*.jpg"))
+    def sample(self):
+        self.loadmodel()
+
+        data = glob(os.path.join("imgs-valid", "*.jpg"))
 
         datalen = len(data)
 
@@ -186,6 +186,7 @@ class Color():
             ims("results/sample_"+str(i)+".jpg",merge_color(recreation, [self.batch_size_sqrt, self.batch_size_sqrt]))
             ims("results/sample_"+str(i)+"_origin.jpg",merge_color(batch_normalized, [self.batch_size_sqrt, self.batch_size_sqrt]))
             ims("results/sample_"+str(i)+"_line.jpg",merge_color(batch_edge, [self.batch_size_sqrt, self.batch_size_sqrt]))
+            ims("results/sample_"+str(i)+"_color.jpg",merge_color(batch_colors, [self.batch_size_sqrt, self.batch_size_sqrt]))
 
 
     def save(self, checkpoint_dir, step):
@@ -215,6 +216,16 @@ class Color():
             return False
 
 
-c = Color()
-# c.train()
-c.sample()
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print "Usage: python main.py [train, sample]"
+    else:
+        cmd = sys.argv[1]
+        if cmd == "train":
+            c = Color()
+            c.train()
+        elif cmd == "sample":
+            c = Color()
+            c.sample()
+        else:
+            print "Usage: python main.py [train, sample]"
