@@ -146,7 +146,10 @@ $("#submit").click(function () {
         data: {colors: dataURLc, lines: dataURL},
         // data: {lines: "meme"},
         success: function (result) {
-            console.log("Upload complete!");
+            console.log("Upload complete!!");
+            console.log(result.length);
+            console.log(result);
+            $('#result').html('<img src="data:image/png;base64,' + result + '" />');
         },
         error: function (error) {
             console.log("Something went wrong!");
