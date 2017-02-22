@@ -10,12 +10,30 @@ from main import *
 
 BaseRequest.MEMFILE_MAX = 1000 * 1000
 
-c = Color(512, 1)
-c.loadmodel(False)
+# c = Color(512, 1)
+# c.loadmodel(False)
 
 @route('/<filename:path>')
 def send_static(filename):
     return static_file(filename, root='web/')
+
+
+@route("/upload_toline", method="POST")
+def do_uploadtl():
+    print "Parsing line"
+    img = request.files.get('img')
+    lines_img = cv2.imdecode(np.fromstring(img.file.read(), np.uint8), cv2.CV_LOAD_IMAGE_UNCHANGED)
+    lines_img = np.array(cv2.resize(lines_img, (512,512)))
+    lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
+
+    lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))
+
+    # lines_img[:,:,3] = lines_img[:,:,0]
+
+    cv2.imwrite("uploaded/convert.png", lines_img)
+
+    cnt = cv2.imencode(".png",lines_img)[1]
+    return base64.b64encode(cnt)
 
 
 @route('/upload_canvas', method='POST')
@@ -58,33 +76,6 @@ def do_uploadc():
 
     cnt = cv2.imencode(".png",generated[0]*255)[1]
     return base64.b64encode(cnt)
-
-@route('/upload', method='POST')
-def do_upload():
-    lines = request.files.get('lines')
-    colors = request.files.get('colors')
-
-    lines_img = cv2.imdecode(np.fromstring(lines.file.read(), np.uint8), cv2.CV_LOAD_IMAGE_UNCHANGED)
-    lines_img = np.array(cv2.resize(lines_img, (512,512)))
-    # lines_img = cv2.adaptiveThreshold(lines_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
-    lines_img = np.array([lines_img]) / 255.0
-    lines_img = np.expand_dims(lines_img, 3)
-
-    colors_img = cv2.imdecode(np.fromstring(colors.file.read(), np.uint8), cv2.CV_LOAD_IMAGE_UNCHANGED)
-    colors_img = np.array(cv2.resize(colors_img, (512,512)))
-    colors_img = cv2.blur(colors_img, (100, 100))
-    colors_img = np.array([colors_img]) / 255.0
-
-    cv2.imwrite("uploaded/lines.jpg", lines_img[0]*255)
-    cv2.imwrite("uploaded/colors.jpg", colors_img[0]*255)
-
-    generated = c.sess.run(c.generated_images, feed_dict={c.line_images: lines_img, c.color_images: colors_img})
-
-    cv2.imwrite("uploaded/gen.jpg", generated[0]*255)
-
-    return static_file("uploaded/gen.jpg",
-                       root=".",
-                       mimetype='image/jpg')
 
 @route('/upload_origin', method='POST')
 def do_uploado():
