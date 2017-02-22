@@ -28,6 +28,10 @@ var isMouseDown = false;
 
 
 function handleMouseDown(e) {
+    canvasOffset = $("#color").offset();
+    offsetX = canvasOffset.left;
+    offsetY = canvasOffset.top;
+
     mouseX = parseInt(e.clientX - offsetX);
     mouseY = parseInt(e.clientY - offsetY);
 
@@ -107,6 +111,47 @@ $("#pen").click(function () {
 });
 $("#eraser").click(function () {
     mode = "eraser";
+});
+
+$(document).keypress(function(e) {
+    console.log(e.which)
+    if(e.which == 100) {
+        mode = "pen";
+    }
+    if(e.which == 101)
+    {
+        mode = "eraser";
+    }
+});
+
+$("#uploadform").bind('submit', function (e) {
+    e.preventDefault();
+
+    console.log("Uploadin");
+    var files = document.getElementById('fileselect').files;
+    var formData = new FormData();
+        // Loop through each of the selected files.
+    for (var i = 0; i < files.length; i++)
+    {
+        var file = files[i];
+        formData.append('img', file, file.name);
+    }
+    $.ajax({
+        url: '/upload_toline',
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function(result){
+            var image = new Image();
+            image.onload = function() {
+                linectx.drawImage(image, 0, 0);
+            };
+            image.src = 'data:image/png;base64,' + result;
+        }
+    });
+
+    return false;
 });
 
 $("#submit").click(function () {
@@ -248,8 +293,13 @@ var gamma = 1;
 
     el.addEventListener('click', function (e) {
 
-        var x = e.pageX - el.offsetLeft;
-        var y = e.pageY - el.offsetTop;
+        canvasOffset = $("#surface").offset();
+        offsetX = canvasOffset.left;
+        offsetY = canvasOffset.top;
+
+        var x = e.pageX - offsetX;
+        var y = e.pageY - offsetY;
+
 
         data = el.getContext('2d').getImageData(x, y, 1, 1).data;
         console.log(data[0] + ',' + data[1] + ',' + data[2]);

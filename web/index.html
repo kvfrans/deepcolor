@@ -72,15 +72,24 @@
     }
 </style>
 
-<table>
+<table border=0>
     <tr>
         <td>
-            1. Draw outline with pen/eraser
+            1. Draw an outline with pen and eraser
             <br>
-            <button id="pen">Pen</button>
-            <button id="eraser">Eraser</button>
+            <button id="pen">Pen (D)</button>
+            <button id="eraser">Eraser (E)</button>
             <br>
             <br>
+            Other option: upload an image to convert it to an outline.
+            <form action="/upload_toline" method="post" enctype="multipart/form-data" id="uploadform">
+              Select a file: <input type="file" name="img" id="fileselect"/>
+              <input type="submit" value="Start upload" />
+            </form>
+
+            <br>
+            <br>
+            <hr>
             2. Add color hints (messy is fine)
 
             <div class="colorpicker">
@@ -98,6 +107,7 @@
             </div>
             <br>
             <br>
+            <hr>
             3. Submit
             <button id="submit">Submit</button>
         </td>
