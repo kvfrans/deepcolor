@@ -8,7 +8,7 @@ var colorcanvas = document.getElementById("color");
 var colorctx = colorcanvas.getContext("2d");
 colorctx.lineCap = "round";
 colorctx.lineJoin = "round";
-colorctx.lineWidth = 6;
+colorctx.lineWidth = 15;
 
 
 colorctx.beginPath();

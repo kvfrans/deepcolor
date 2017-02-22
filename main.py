@@ -4,6 +4,7 @@ import os
 from glob import glob
 import sys
 import math
+from random import randint
 
 import ops
 from ops import *
@@ -12,7 +13,7 @@ from utils import *
 class Color():
     def __init__(self, imgsize=256, batchsize=4):
         self.batch_size = batchsize
-        self.batch_size_sqrt = math.sqrt(self.batch_size)
+        self.batch_size_sqrt = int(math.sqrt(self.batch_size))
         self.image_size = imgsize
         self.output_size = imgsize
 
@@ -34,6 +35,7 @@ class Color():
         self.real_images = tf.placeholder(tf.float32, [self.batch_size, self.image_size, self.image_size, self.output_colors])
 
         combined_preimage = tf.concat(3, [self.line_images, self.color_images])
+        # combined_preimage = self.line_images
 
         self.generated_images = self.generator(combined_preimage)
 
@@ -109,6 +111,16 @@ class Color():
         return tf.nn.tanh(self.d8)
 
 
+    def imageblur(self, cimg, sampling=False):
+        if sampling:
+            cimg = cimg * 0.3
+        else:
+            for i in xrange(30):
+                randx = randint(0,205)
+                randy = randint(0,205)
+                cimg[randx:randx+50, randy:randy+50] = 255
+        return cv2.blur(cimg,(100,100))
+
     def train(self):
         self.loadmodel()
 
@@ -120,7 +132,7 @@ class Color():
         base_edge = np.array([cv2.adaptiveThreshold(cv2.cvtColor(ba, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2) for ba in base]) / 255.0
         base_edge = np.expand_dims(base_edge, 3)
 
-        base_colors = np.array([cv2.blur(ba,(100,100)) for ba in base]) / 255.0
+        base_colors = np.array([self.imageblur(ba) for ba in base]) / 255.0
 
         ims("results/base.png",merge_color(base_normalized, [self.batch_size_sqrt, self.batch_size_sqrt]))
         ims("results/base_line.jpg",merge(base_edge, [self.batch_size_sqrt, self.batch_size_sqrt]))
@@ -137,7 +149,7 @@ class Color():
                 batch_edge = np.array([cv2.adaptiveThreshold(cv2.cvtColor(ba, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2) for ba in batch]) / 255.0
                 batch_edge = np.expand_dims(batch_edge, 3)
 
-                batch_colors = np.array([cv2.blur(ba,(100,100)) for ba in batch]) / 255.0
+                batch_colors = np.array([self.imageblur(ba) for ba in batch]) / 255.0
 
                 d_loss, _ = self.sess.run([self.d_loss, self.d_optim], feed_dict={self.real_images: batch_normalized, self.line_images: batch_edge, self.color_images: batch_colors})
                 g_loss, _ = self.sess.run([self.g_loss, self.g_optim], feed_dict={self.real_images: batch_normalized, self.line_images: batch_edge, self.color_images: batch_colors})
@@ -180,7 +192,7 @@ class Color():
             batch_edge = np.array([cv2.adaptiveThreshold(cv2.cvtColor(ba, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2) for ba in batch]) / 255.0
             batch_edge = np.expand_dims(batch_edge, 3)
 
-            batch_colors = np.array([cv2.blur(ba,(100,100)) for ba in batch]) / 255.0
+            batch_colors = np.array([self.imageblur(ba,True) for ba in batch]) / 255.0
 
             recreation = self.sess.run(self.generated_images, feed_dict={self.real_images: batch_normalized, self.line_images: batch_edge, self.color_images: batch_colors})
             ims("results/sample_"+str(i)+".jpg",merge_color(recreation, [self.batch_size_sqrt, self.batch_size_sqrt]))

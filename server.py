@@ -10,8 +10,8 @@ from main import *
 
 BaseRequest.MEMFILE_MAX = 1000 * 1000
 
-# c = Color(512, 1)
-# c.loadmodel(False)
+c = Color(512, 1)
+c.loadmodel(False)
 
 @route('/<filename:path>')
 def send_static(filename):
