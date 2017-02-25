@@ -35,12 +35,16 @@ class Color():
         self.real_images = tf.placeholder(tf.float32, [self.batch_size, self.image_size, self.image_size, self.output_colors])
 
         combined_preimage = tf.concat(3, [self.line_images, self.color_images])
+        # combined_preimage = tf.concat([self.line_images, self.color_images], 3)
         # combined_preimage = self.line_images
 
         self.generated_images = self.generator(combined_preimage)
 
         self.real_AB = tf.concat(3, [combined_preimage, self.real_images])
         self.fake_AB = tf.concat(3, [combined_preimage, self.generated_images])
+
+        # self.real_AB = tf.concat([combined_preimage, self.real_images], 3)
+        # self.fake_AB = tf.concat([combined_preimage, self.generated_images], 3)
 
         self.disc_true, disc_true_logits = self.discriminator(self.real_AB, reuse=False)
         self.disc_fake, disc_fake_logits = self.discriminator(self.fake_AB, reuse=True)
