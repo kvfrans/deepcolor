@@ -35,6 +35,15 @@ def do_uploadtl():
     cnt = cv2.imencode(".png",lines_img)[1]
     return base64.b64encode(cnt)
 
+def imageblur(cimg, sampling=False):
+    if sampling:
+        cimg = cimg * 0.3 + np.ones_like(cimg) * 0.7 * 255
+    else:
+        for i in xrange(30):
+            randx = randint(0,205)
+            randy = randint(0,205)
+            cimg[randx:randx+50, randy:randy+50] = 255
+    return cv2.blur(cimg,(100,100))
 
 @route('/upload_canvas', method='POST')
 def do_uploadc():
@@ -63,7 +72,8 @@ def do_uploadc():
     lines_img = np.expand_dims(lines_img, 3)
 
     colors_img = np.array(cv2.resize(color_img, (512,512)))
-    colors_img = cv2.blur(colors_img, (100, 100))
+    # colors_img = cv2.blur(colors_img, (100, 100))
+    colors_img = imageblur(colors_img, True)
     colors_img = np.array([colors_img]) / 255.0
     colors_img = colors_img[:,:,:,0:3]
 
