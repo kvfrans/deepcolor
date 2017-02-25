@@ -10,6 +10,16 @@ import ops
 from ops import *
 from utils import *
 
+def imageblur(cimg, sampling=False):
+    if sampling:
+        cimg = cimg * 0.3 + np.ones_like(cimg) * 0.7 * 255
+    else:
+        for i in xrange(30):
+            randx = randint(0,205)
+            randy = randint(0,205)
+            cimg[randx:randx+50, randy:randy+50] = 255
+    return cv2.blur(cimg,(100,100))
+
 class Color():
     def __init__(self, imgsize=256, batchsize=4):
         self.batch_size = batchsize
@@ -117,7 +127,7 @@ class Color():
 
     def imageblur(self, cimg, sampling=False):
         if sampling:
-            cimg = cimg * 0.3
+            cimg = cimg * 0.3 + np.ones_like(cimg) * 0.7 * 255
         else:
             for i in xrange(30):
                 randx = randint(0,205)
@@ -184,7 +194,7 @@ class Color():
     def sample(self):
         self.loadmodel()
 
-        data = glob(os.path.join("imgs-valid", "*.jpg"))
+        data = glob(os.path.join("imgs", "*.jpg"))
 
         datalen = len(data)
 
