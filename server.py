@@ -17,6 +17,14 @@ c.loadmodel(False)
 def send_static(filename):
     return static_file(filename, root='web/')
 
+@route('/draw')
+def send_static():
+    return static_file("draw.html", root='web/')
+
+@route('/')
+def send_static():
+    return static_file("index.html", root='web/')
+
 def imageblur(cimg, sampling=False):
     if sampling:
         cimg = cimg * 0.3 + np.ones_like(cimg) * 0.7 * 255
@@ -27,6 +35,23 @@ def imageblur(cimg, sampling=False):
             cimg[randx:randx+50, randy:randy+50] = 255
     return cv2.blur(cimg,(100,100))
 
+@route("/standard_sanae", method="POST")
+def do_uploadtl():
+    lines_img = cv2.imread("uploaded/sanae.png", 1)
+    lines_img = np.array(cv2.resize(lines_img, (512,512)))
+    lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
+    lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))
+    cnt = cv2.imencode(".png",lines_img)[1]
+    return base64.b64encode(cnt)
+
+@route("/standard_picasso", method="POST")
+def do_uploadtl():
+    lines_img = cv2.imread("uploaded/picasso.png", 1)
+    lines_img = np.array(cv2.resize(lines_img, (512,512)))
+    lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
+    lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))
+    cnt = cv2.imencode(".png",lines_img)[1]
+    return base64.b64encode(cnt)
 
 @route("/upload_toline", method="POST")
 def do_uploadtl():
@@ -35,13 +60,7 @@ def do_uploadtl():
     lines_img = cv2.imdecode(np.fromstring(img.file.read(), np.uint8), cv2.CV_LOAD_IMAGE_UNCHANGED)
     lines_img = np.array(cv2.resize(lines_img, (512,512)))
     lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
-
     lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))
-
-    # lines_img[:,:,3] = lines_img[:,:,0]
-
-    cv2.imwrite("uploaded/convert.png", lines_img)
-
     cnt = cv2.imencode(".png",lines_img)[1]
     return base64.b64encode(cnt)
 
@@ -86,14 +105,7 @@ def do_uploadc():
     colors_img = imageblur(colors_img, True)
     colors_img = np.array([colors_img]) / 255.0
     colors_img = colors_img[:,:,:,0:3]
-
-    cv2.imwrite("uploaded/lines.jpg", lines_img[0]*255)
-    cv2.imwrite("uploaded/colors.jpg", colors_img[0]*255)
-
     generated = c.sess.run(c.generated_images, feed_dict={c.line_images: lines_img, c.color_images: colors_img})
-
-    cv2.imwrite("uploaded/gen.jpg", generated[0]*255)
-
     cnt = cv2.imencode(".png",generated[0]*255)[1]
     return base64.b64encode(cnt)
 

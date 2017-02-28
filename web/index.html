@@ -1,129 +1,104 @@
-<style>
-    body {
-        background-color: ivory;
-    }
-    #wrapper {
-        position:relative;
-        width:512px;
-        height:512px;
-    }
-    #line, #color {
-        position:absolute;
-        top:0px;
-        left:0px;
-        border:1px solid green;
-        width:100%;
-        height:100%;
-    }
-    #color {
-        border:2px solid red;
-    }
 
-    body{ background-color: white; }
+<!-- Latest compiled and minified JavaScript -->
 
-    div.colorpicker{
-        min-width:300px;
-    }
+<html lang="en">
+  <head>
+    <title>the color move</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    section * {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        -o-user-select: none;
-        user-select: none;
-    }
-    section {
-        display:inline-block;
-    }
-    .colorwheel #colorwheel {
-        height:200px;
-        width:200px;
-        cursor: cell;
-    }
-    .colorwheel #colorblock {
-        width: 97%;
-        height:25px;
-        margin:0px auto;
-        border:1px solid black;
-        margin-left:8%;
-    }
-    .colorwheel #surface {
-        display:block;
-    }
+    <!-- Custom styles for this template -->
+    <link href="css/grid.css" rel="stylesheet">
+  </head>
 
-    #gamma_wrapper {
-        background-color: white;
-        padding:2px;
-        border:1px solid black;
-        cursor:vertical-text;
-    }
+  <body>
+    <div class="container">
 
-    #gamma_slider {
-        width:10px;
-        height:180px;
-        cursor: vertical-text;
-        background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.12) 57%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.65) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(57%,rgba(0,0,0,0.12)), color-stop(62%,rgba(0,0,0,0.18)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.12) 57%,rgba(0,0,0,0.18) 62%,rgba(0,0,0,0.65) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.12) 57%,rgba(0,0,0,0.18) 62%,rgba(0,0,0,0.65) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.12) 57%,rgba(0,0,0,0.18) 62%,rgba(0,0,0,0.65) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.12) 57%,rgba(0,0,0,0.18) 62%,rgba(0,0,0,0.65) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=0 ); /* IE6-9 */
-    }
-</style>
+      <div class="page-header">
+          <center>
+            <h1>deepcolor</h1>
+            <p class="lead">utilize the power of <a href="http://kvfrans.com/generative-adversial-networks-explained/">mathematical magic</a> to automatically color a sketch or lineart</p>
 
-<table border=0>
-    <tr>
-        <td>
-            1. Draw an outline with pen and eraser
-            <br>
-            <button id="pen">Pen (D)</button>
-            <button id="eraser">Eraser (E)</button>
-            <br>
-            <br>
-            Other option: upload an image to convert it to an outline.
-            <form action="/upload_toline" method="post" enctype="multipart/form-data" id="uploadform">
-              Select a file: <input type="file" name="img" id="fileselect"/>
-              <input type="submit" value="Start upload" />
-            </form>
+            <a class="btn btn-lg btn-primary" href="/draw" role="button">Try it »</a>
 
-            <br>
-            <br>
-            <hr>
-            2. Add color hints (messy is fine)
+        </center>
+      </div>
 
-            <div class="colorpicker">
-                <section class="colorwheel">
-                    <div id="colorblock"></div>
+      <h3>Examples</h3>
+      <p>Only line image <a href="http://safebooru.org/index.php?page=post&s=view&id=1968511">[source]</a> </p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/1_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/1_color.png" />
+        </div>
+      </div>
 
-                    <article id="colorwheel">
-                        <canvas id="surface"></canvas>
-                    </article>
-                </section>
+      <p> Line image with color hints </p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/2_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/2_color.png" />
+        </div>
+      </div>
 
-                <section id="gamma_wrapper">
-                    <article id="gamma_slider"></article>
-                </section>
-            </div>
-            <br>
-            <br>
-            <hr>
-            3. Submit
-            <button id="submit">Submit</button>
-        </td>
-        <td>
-            <div id="wrapper">
-                <canvas id="color" width=512 height=512></canvas>
-                <canvas id="line" width=512 height=512></canvas>
-            </div>
-        </td>
-        <td>
-            <div id="result">
-            </div>
-        </td>
-    </tr>
-</table>
-<pre id="color_selection"></pre>
+      <p> Fine art <a href="https://www.vanartgallery.bc.ca/the_exhibitions/exhibit_picasso.html">[source (Picasso)]</a></p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/3_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/3_color.png" />
+        </div>
+      </div>
 
-<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="sketch.js"></script>
+      <p> Picasso with color hint </p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/4_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/4_color.png" />
+        </div>
+      </div>
+
+      <p> Confusing background </p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/5_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/5_color.png" />
+        </div>
+      </div>
+
+      <p> Heterochromia </p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/6_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/6_color.png" />
+        </div>
+      </div>
+
+      <p>My bad attempt at drawing </p>
+      <div class="row">
+        <div class="col-md-6">
+            <img src="images/7_line.png" />
+        </div>
+        <div class="col-md-6">
+            <img src="images/7_color.png" />
+        </div>
+      </div>
+
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  </body>
+</html>
