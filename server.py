@@ -136,4 +136,4 @@ def do_uploado():
                        root=".",
                        mimetype='image/jpg')
 
-run(host="localhost", port=8000)
+run(host="0.0.0.0", port=8000)
