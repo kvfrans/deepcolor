@@ -37,7 +37,16 @@ def imageblur(cimg, sampling=False):
 
 @route("/standard_sanae", method="POST")
 def do_uploadtl():
-    lines_img = cv2.imread("uploaded/sanae.png", 1)
+    lines_img = cv2.imread("web/image_examples/sanae.png", 1)
+    lines_img = np.array(cv2.resize(lines_img, (512,512)))
+    lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
+    lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))
+    cnt = cv2.imencode(".png",lines_img)[1]
+    return base64.b64encode(cnt)
+
+@route("/standard_armscross", method="POST")
+def do_uploadtl():
+    lines_img = cv2.imread("web/image_examples/armscross.png", 1)
     lines_img = np.array(cv2.resize(lines_img, (512,512)))
     lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
     lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))
@@ -46,7 +55,7 @@ def do_uploadtl():
 
 @route("/standard_picasso", method="POST")
 def do_uploadtl():
-    lines_img = cv2.imread("uploaded/picasso.png", 1)
+    lines_img = cv2.imread("web/image_examples/picasso.png", 1)
     lines_img = np.array(cv2.resize(lines_img, (512,512)))
     lines_img = cv2.adaptiveThreshold(cv2.cvtColor(lines_img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
     lines_img = cv2.merge((lines_img,lines_img,lines_img,255 - lines_img))

@@ -275,6 +275,28 @@ $(document).ready(function(){
             }
         });
     });
+    $("#armsbutton").click(function(){
+        console.log("clicked");
+        $.ajax({
+            url: '/standard_armscross',
+            data: "nothing",
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(result){
+                var image = new Image();
+                image.onload = function() {
+                    colorctx.beginPath();
+                    colorctx.rect(0, 0, 512, 512);
+                    colorctx.fillStyle = "white";
+                    colorctx.fill();
+                    linectx.clearRect(0, 0, 512, 512);
+                    linectx.drawImage(image, 0, 0);
+                };
+                image.src = 'data:image/png;base64,' + result;
+            }
+        });
+    });
 });
 
 
