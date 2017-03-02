@@ -7,4 +7,7 @@ checkpoint_old/
 main.pyc
 utils.pyc
 server.pyc
-op.pyc
+ops.pyc
+cv.py
+cv2.so
+*.pyc
