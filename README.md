@@ -1,4 +1,4 @@
-# deepcolor: Automatic coloring and shading of manga-style lineart
+# deepcolor: Automatic coloring and shading of manga-style lineart, using Tensorflow + cGANs
 
 ![](http://kvfrans.com/content/images/2017/03/Screen-Shot-2017-03-01-at-11-09-09-PM-1.png)
 
