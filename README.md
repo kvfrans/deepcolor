@@ -6,6 +6,7 @@
 
 Setup:
 ```
+0. Have tensorflow + OpenCV installed.
 1. make a folder called "results"
 2. make a folder called "imgs"
 3. Fill the "imgs" folder with your own .jpg images, or run "download_images.py" to download from Safebooru.
