@@ -6,8 +6,6 @@ import sys
 import math
 from random import randint
 
-import ops
-from ops import *
 from utils import *
 
 def imageblur(cimg, sampling=False):
