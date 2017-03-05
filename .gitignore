@@ -6,3 +6,10 @@ checkpoint/
 checkpoint_old/
 old_results/
 uploaded/
+main.pyc
+utils.pyc
+server.pyc
+ops.pyc
+cv.py
+cv2.so
+*.pyc
