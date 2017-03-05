@@ -169,8 +169,8 @@ $("#uploadform").bind('submit', function (e) {
     return false;
 });
 
-$("#submit").click(function () {
-
+function submit(url)
+{
     // change non-opaque pixels to white
     var imgData = linectx.getImageData(0,0,512,512);
     var data = imgData.data;
@@ -201,7 +201,7 @@ $("#submit").click(function () {
     // console.log(dataURL)
 
     $.ajax({
-        url: '/upload_canvas',
+        url: url,
         type: "POST",
         data: {colors: dataURLc, lines: dataURL},
         // data: {lines: "meme"},
@@ -215,7 +215,18 @@ $("#submit").click(function () {
             console.log("Something went wrong!");
         }
     });
+}
+
+$("#submit").click(function () {
+
+    submit("/upload_canvas")
 });
+
+$("#submit_autocolor").click(function () {
+
+    submit("/upload_lineonly")
+});
+
 
 
 
