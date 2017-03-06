@@ -8,8 +8,6 @@ from random import randint
 
 from utils import *
 
-
-
 class Palette():
     def __init__(self, imgsize=256, batchsize=4):
         self.batch_size = batchsize
@@ -104,7 +102,7 @@ class Palette():
         return seg
 
     def train(self):
-        self.loadmodel()
+        self.loadmodel(tf.Session())
 
         data = glob(os.path.join("imgs", "*.jpg"))
         print data[0]
@@ -146,9 +144,9 @@ class Palette():
                 if i % 300 == 0:
                     self.save("./checkpoint", e*100000 + i)
 
-    def loadmodel(self, load_discrim=True):
-        self.sess = tf.Session()
-        self.sess.run(tf.initialize_all_variables())
+    def loadmodel(self, sess, load_discrim=True):
+        self.sess = sess
+        # self.sess.run(tf.initialize_all_variables())
 
         if load_discrim:
             self.saver = tf.train.Saver()

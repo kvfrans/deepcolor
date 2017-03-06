@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import re
 import base64
+import tensorflow as tf
 
 import main
 from main import *
@@ -13,10 +14,10 @@ from guess_colors import *
 BaseRequest.MEMFILE_MAX = 1000 * 1000
 
 c = Color(512, 1)
-c.loadmodel(False)
-
 p = Palette(512, 1)
-p.loadmodel(False)
+
+c.loadmodel(load_discrim=False)
+p.loadmodel(c.sess, load_discrim=False)
 
 
 @route('/<filename:path>')
