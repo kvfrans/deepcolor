@@ -171,6 +171,10 @@ $("#uploadform").bind('submit', function (e) {
 
 function submit(url)
 {
+    $("#submit").prop("disabled",true);
+    $("#submit_autocolor").prop("disabled",true);
+    $("#submit").html('Processing...');
+    $("#submit_autocolor").html('Processing...');
     // change non-opaque pixels to white
     var imgData = linectx.getImageData(0,0,512,512);
     var data = imgData.data;
@@ -210,6 +214,11 @@ function submit(url)
             // console.log(result.length);
             // console.log(result);
             $('#result').html('<img src="data:image/png;base64,' + result + '" />');
+            $("#submit").prop("disabled",false);
+            $("#submit_autocolor").prop("disabled",false);
+
+            $("#submit").html('Submit (using color hint)');
+            $("#submit_autocolor").html('Submit (auto color)');
         },
         error: function (error) {
             console.log("Something went wrong!");
