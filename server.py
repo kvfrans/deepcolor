@@ -144,23 +144,14 @@ def do_uploadc():
 
     color_img = p.sess.run(p.generated_images, feed_dict={p.line_images: lines_img})
     color_img = np.array([cv2.resize(x, (512,512)) for x in color_img])
-    print color_img.shape
     # print line_img.shape
     color_img = color_img * (lines_img[:,:] / 255.0)
-    print color_img.shape
 
-    # colors_img = np.expand_dims(cv2.fromarray(color_img), 0)
-    # colors_img = cv2.blur(colors_img, (100, 100))
-    # print colors_img.shape
     colors_img = imageblur(color_img[0], True)
-    print colors_img.shape
     colors_img = np.array([colors_img]) / 255.0
-    print colors_img.shape
     colors_img = colors_img[:,:,:,0:3]
     generated = c.sess.run(c.generated_images, feed_dict={c.line_images: lines_img, c.color_images: colors_img})
     cnt = cv2.imencode(".png",generated[0]*255)[1]
     return base64.b64encode(cnt)
-
-
 
 run(host="0.0.0.0", port=8000)

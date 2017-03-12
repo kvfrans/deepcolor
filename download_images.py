@@ -14,7 +14,7 @@ maxsize = 512
 count = 0
 
 for i in xrange(10000):
-    stringreturn = urllib2.urlopen("http://safebooru.org/index.php?page=dapi&s=post&q=index&tags=1girl%20solo&pid="+str(i+5000)).read()
+    stringreturn = urllib2.urlopen("http://safebooru.org/index.php?page=dapi&s=post&q=index&tags=1girl%20solo&pid="+str(i+3000)).read()
     xmlreturn = untangle.parse(stringreturn)
     for post in xmlreturn.posts.post:
         imgurl = "http:" + post["sample_url"]
@@ -43,5 +43,5 @@ for i in xrange(10000):
             #                                  C=2)
 
             count += 1
-            cv2.imwrite("imgs-valid/"+str(count)+".jpg",cropped)
+            cv2.imwrite("imgs/"+str(count)+".jpg",cropped)
             # cv2.imwrite("imgs/"+str(post["id"])+"-edge.jpg",img_edge)

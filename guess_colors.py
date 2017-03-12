@@ -160,7 +160,10 @@ class Palette():
             print "Load failed"
 
     def sample(self):
-        self.loadmodel(False)
+        s = tf.Session()
+        s.run(tf.initialize_all_variables())
+        self.loadmodel(s, False)
+
 
         data = glob(os.path.join("imgs", "*.jpg"))
 
@@ -175,7 +178,7 @@ class Palette():
             batch_edge = np.expand_dims(batch_edge, 3)
 
             recreation = self.sess.run(self.generated_images, feed_dict={self.line_images: batch_edge})
-            ims("results/sample_"+str(i)+".jpg",merge_color(np.array([cv2.resize(x, (256,256), interpolation=cv2.INTER_NEAREST) for x in recreation]), [self.batch_size_sqrt, self.batch_size_sqrt]))
+            ims("results/sample_"+str(i)+".jpg",merge_color(np.array([cv2.resize(x, (512,512), interpolation=cv2.INTER_NEAREST) for x in recreation]), [self.batch_size_sqrt, self.batch_size_sqrt]))
             ims("results/sample_"+str(i)+"_origin.jpg",merge_color(batch_normalized, [self.batch_size_sqrt, self.batch_size_sqrt]))
             ims("results/sample_"+str(i)+"_line.jpg",merge_color(batch_edge, [self.batch_size_sqrt, self.batch_size_sqrt]))
 

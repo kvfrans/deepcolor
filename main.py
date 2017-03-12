@@ -178,7 +178,7 @@ class Color():
             print "Load failed"
 
     def sample(self):
-        self.loadmodel()
+        self.loadmodel(False)
 
         data = glob(os.path.join("imgs", "*.jpg"))
 
@@ -186,7 +186,7 @@ class Color():
 
         for i in range(min(100,datalen / self.batch_size)):
             batch_files = data[i*self.batch_size:(i+1)*self.batch_size]
-            batch = np.array([get_image(batch_file) for batch_file in batch_files])
+            batch = np.array([cv2.resize(imread(batch_file), (512,512)) for batch_file in batch_files])
             batch_normalized = batch/255.0
 
             batch_edge = np.array([cv2.adaptiveThreshold(cv2.cvtColor(ba, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2) for ba in batch]) / 255.0
@@ -199,7 +199,6 @@ class Color():
             ims("results/sample_"+str(i)+"_origin.jpg",merge_color(batch_normalized, [self.batch_size_sqrt, self.batch_size_sqrt]))
             ims("results/sample_"+str(i)+"_line.jpg",merge_color(batch_edge, [self.batch_size_sqrt, self.batch_size_sqrt]))
             ims("results/sample_"+str(i)+"_color.jpg",merge_color(batch_colors, [self.batch_size_sqrt, self.batch_size_sqrt]))
-
 
     def save(self, checkpoint_dir, step):
         model_name = "model"
@@ -237,7 +236,7 @@ if __name__ == '__main__':
             c = Color()
             c.train()
         elif cmd == "sample":
-            c = Color()
+            c = Color(512,1)
             c.sample()
         else:
             print "Usage: python main.py [train, sample]"
