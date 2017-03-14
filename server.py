@@ -14,10 +14,10 @@ from guess_colors import *
 BaseRequest.MEMFILE_MAX = 1000 * 1000
 
 c = Color(512, 1)
-p = Palette(512, 1)
+p = Palette(256, 1)
 
 c.loadmodel(load_discrim=False)
-p.loadmodel(c.sess, load_discrim=False)
+p.loadmodel(c.sess, False)
 
 
 @route('/<filename:path>')
@@ -107,18 +107,13 @@ def do_uploadc():
     color_img = np.fromstring(color_s, dtype=np.uint8)
     color_img = cv2.imdecode(color_img, -1)
 
-    # for c in range(0,3):
-    color_img = color_img * (line_img[:,:] / 255.0)
-
     lines_img = np.array(cv2.resize(line_img, (512,512)))
-    # lines_img = cv2.adaptiveThreshold(lines_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
     lines_img = np.array([lines_img]) / 255.0
     lines_img = lines_img[:,:,:,0]
     lines_img = np.expand_dims(lines_img, 3)
 
-    colors_img = np.array(cv2.resize(color_img, (512,512)))
-    # colors_img = cv2.blur(colors_img, (100, 100))
-    colors_img = imageblur(colors_img, True)
+    color_img = color_img[:,:,:] * lines_img[0,:,:,:]
+    colors_img = imageblur(color_img, True)
     colors_img = np.array([colors_img]) / 255.0
     colors_img = colors_img[:,:,:,0:3]
     generated = c.sess.run(c.generated_images, feed_dict={c.line_images: lines_img, c.color_images: colors_img})
@@ -137,17 +132,22 @@ def do_uploadc():
     line_img = cv2.imdecode(line_img, -1)
 
     lines_img = np.array(cv2.resize(line_img, (512,512)))
-    # lines_img = cv2.adaptiveThreshold(lines_img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, blockSize=9, C=2)
     lines_img = np.array([lines_img]) / 255.0
     lines_img = lines_img[:,:,:,0]
     lines_img = np.expand_dims(lines_img, 3)
 
-    color_img = p.sess.run(p.generated_images, feed_dict={p.line_images: lines_img})
-    color_img = np.array([cv2.resize(x, (512,512)) for x in color_img])
-    # print line_img.shape
-    color_img = color_img * (lines_img[:,:] / 255.0)
+    lines_img_sm = np.array(cv2.resize(line_img, (256,256)))
+    lines_img_sm = np.array([lines_img_sm]) / 255.0
+    lines_img_sm = lines_img_sm[:,:,:,0]
+    lines_img_sm = np.expand_dims(lines_img_sm, 3)
 
-    colors_img = imageblur(color_img[0], True)
+    random_z = np.random.normal(0, 1, [p.batch_size, p.z_dim])
+
+    color_img = p.sess.run(p.generated_images, feed_dict={p.line_images: lines_img_sm, p.guessed_z: random_z})
+    color_img = np.array([cv2.resize(x, (512,512),  interpolation=cv2.INTER_NEAREST) for x in color_img])[0]
+
+    color_img = color_img * 255.0
+    colors_img = imageblur(color_img, True)
     colors_img = np.array([colors_img]) / 255.0
     colors_img = colors_img[:,:,:,0:3]
     generated = c.sess.run(c.generated_images, feed_dict={c.line_images: lines_img, c.color_images: colors_img})

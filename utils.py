@@ -14,6 +14,9 @@ class batch_norm(object):
         return tf.contrib.layers.batch_norm(x, decay=self.momentum, updates_collections=None, epsilon=self.epsilon, scale=True, scope=self.name)
 
 batchnorm_count = 0
+def bnreset():
+    global batchnorm_count
+    batchnorm_count = 0
 def bn(x):
     global batchnorm_count
     batch_object = batch_norm(name=("bn" + str(batchnorm_count)))
